@@ -8,50 +8,78 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
         .result-available { background-color: #d4edda; }
         .result-unavailable { background-color: #f8d7da; }
-        .response-ir { 
+        td.response-ir, 
+        .response-ir td { 
             background-color: #dc3545 !important; 
             color: white !important; 
         }
     </style>
 </head>
-<body>
+<body class="bg-light">
     <div class="container py-4">
-        <h1>Hachette Order Response Checker</h1>
-        
-        <div class="row mt-4">
-            <div class="col-md-10">
-                <form id="upload-form" class="mb-4">
-                    <div class="mb-3">
-                        <label for="file-upload" class="form-label">Upload Response File:</label>
-                        <input type="file" class="form-control" id="file-upload" 
-                            accept=".csv,.xlsx,.xls,.ppr" required>
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Hachette Order Response Checker</h4>
+                        <div>
+                            <button class="btn btn-outline-light me-2" id="clear-button">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                            <button class="btn btn-outline-light" id="download-button" disabled>
+                                <i class="fas fa-download"></i> Download Results
+                            </button>
+                        </div>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" id="process-button" class="btn btn-primary">Process</button>
-                        <button type="button" class="btn btn-secondary" id="clear-button">Clear</button>
-                        <button type="button" class="btn btn-success" id="download-button" disabled>
-                            Download Results
-                        </button>
-                        <button type="button" class="btn btn-info" id="copy-selected" disabled>
-                            Copy Selected
-                        </button>
-                    </div>
-                </form>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Upload File</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="upload-form" class="mb-3">
+                                            <div class="mb-3">
+                                                <label for="file-upload" class="form-label">Upload .PPR File</label>
+                                                <input type="file" class="form-control" id="file-upload" 
+                                                    accept=".csv,.xlsx,.xls,.ppr" required>
+                                            </div>
+                                            <button type="button" id="process-button" class="btn btn-primary w-100">
+                                                <i class="fas fa-cog"></i> Process
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="mt-4">
-                    <h2>Results</h2>
-                    <div id="results-table" class="table-responsive"></div>
+                        <div class="mb-3">
+                            <button class="btn btn-secondary" id="copy-selected" disabled>
+                                <i class="fas fa-copy"></i> Copy Selected
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <h5 class="card-title">Results</h5>
+                            <div id="results-table"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="script.js"></script>
 </body>
