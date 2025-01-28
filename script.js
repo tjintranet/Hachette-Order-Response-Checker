@@ -1,5 +1,6 @@
 let booksData = [];
 let processedResults = [];
+let showIROnly = false;
 
 document.getElementById('process-button').addEventListener('click', function() {
     const fileInput = document.getElementById('file-upload');
@@ -11,6 +12,10 @@ document.getElementById('process-button').addEventListener('click', function() {
 document.getElementById('clear-button').addEventListener('click', clearForm);
 document.getElementById('download-button').addEventListener('click', downloadResults);
 document.getElementById('copy-selected').addEventListener('click', copySelectedRows);
+document.getElementById('show-ir-only').addEventListener('change', function(e) {
+    showIROnly = e.target.checked;
+    displayResults();
+});
 
 async function fetchData() {
     try {
@@ -99,6 +104,11 @@ function displayResults() {
     // Body
     const tbody = document.createElement('tbody');
     processedResults.forEach((row, index) => {
+        // Skip non-IR rows when filter is active
+        if (showIROnly && row.status !== 'Not Available') {
+            return;
+        }
+
         const tr = document.createElement('tr');
         tr.className = row.status === 'Available' ? 'result-available' : 'result-unavailable';
         
@@ -199,6 +209,8 @@ function clearForm() {
     document.getElementById('results-table').innerHTML = '';
     document.getElementById('download-button').disabled = true;
     document.getElementById('copy-selected').disabled = true;
+    document.getElementById('show-ir-only').checked = false;
+    showIROnly = false;
     processedResults = [];
 }
 
