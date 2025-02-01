@@ -2,9 +2,10 @@ let booksData = [];
 let processedResults = [];
 let showIROnly = false;
 
-document.getElementById('file-upload').addEventListener('change', function() {
-    if (this.files && this.files[0]) {
-        handleFileUpload(this.files[0]);
+document.getElementById('process-button').addEventListener('click', function() {
+    const fileInput = document.getElementById('file-upload');
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        handleFileUpload(fileInput.files[0]);
     }
 });
 
