@@ -272,4 +272,5 @@ function downloadResults() {
     }
 }
 
+// Initialize data loading
 fetchData();
