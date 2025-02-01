@@ -2,19 +2,26 @@ let booksData = [];
 let processedResults = [];
 let showIROnly = false;
 
-// Change from process button to file input change event
-document.getElementById('file-upload').addEventListener('change', function() {
-    if (this.files && this.files[0]) {
-        handleFileUpload(this.files[0]);
-    }
-});
+// Wrap all initialization code in DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    // File upload event listener
+    document.getElementById('file-upload').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            handleFileUpload(this.files[0]);
+        }
+    });
 
-document.getElementById('clear-button').addEventListener('click', clearForm);
-document.getElementById('download-button').addEventListener('click', downloadResults);
-document.getElementById('copy-selected').addEventListener('click', copySelectedRows);
-document.getElementById('show-ir-only').addEventListener('change', function(e) {
-    showIROnly = e.target.checked;
-    displayResults();
+    // Other button listeners
+    document.getElementById('clear-button').addEventListener('click', clearForm);
+    document.getElementById('download-button').addEventListener('click', downloadResults);
+    document.getElementById('copy-selected').addEventListener('click', copySelectedRows);
+    document.getElementById('show-ir-only').addEventListener('change', function(e) {
+        showIROnly = e.target.checked;
+        displayResults();
+    });
+
+    // Initialize data loading
+    fetchData();
 });
 
 async function fetchData() {
