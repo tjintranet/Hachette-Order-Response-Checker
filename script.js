@@ -61,6 +61,7 @@ function handleFileUpload(file) {
                 });
             });
             
+            updateDashboard();
             displayResults();
             document.getElementById('download-button').disabled = false;
         }
@@ -71,6 +72,28 @@ function handleFileUpload(file) {
     };
     
     reader.readAsText(file);
+}
+
+function updateDashboard() {
+    const dashboardSection = document.getElementById('dashboard-section');
+    
+    if (processedResults.length === 0) {
+        dashboardSection.classList.add('dashboard-hidden');
+        return;
+    }
+
+    // Show dashboard
+    dashboardSection.classList.remove('dashboard-hidden');
+
+    // Calculate statistics
+    const totalCount = processedResults.length;
+    const acceptedCount = processedResults.filter(row => row.status === 'Available').length;
+    const rejectedCount = processedResults.filter(row => row.status === 'Not Available').length;
+
+    // Update dashboard elements
+    document.getElementById('total-count').textContent = totalCount.toLocaleString();
+    document.getElementById('accepted-count').textContent = acceptedCount.toLocaleString();
+    document.getElementById('rejected-count').textContent = rejectedCount.toLocaleString();
 }
 
 function displayResults() {
@@ -214,6 +237,7 @@ async function copySelectedRows() {
 function clearForm() {
     document.getElementById('upload-form').reset();
     document.getElementById('results-table').innerHTML = '';
+    document.getElementById('dashboard-section').classList.add('dashboard-hidden');
     document.getElementById('download-button').disabled = true;
     document.getElementById('copy-selected').disabled = true;
     document.getElementById('show-ir-only').checked = false;

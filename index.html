@@ -21,6 +21,21 @@
             background-color: #dc3545 !important; 
             color: white !important; 
         }
+        .dashboard-card {
+            transition: transform 0.2s;
+            padding-right: 30px;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+        .stats-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+            padding-left: 30px;
+        }
+        .dashboard-hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -48,12 +63,61 @@
                                     </div>
                                     <div class="card-body">
                                         <form id="upload-form" class="mb-3">
-   									 <div class="mb-3">
-        								<label for="file-upload" class="form-label">Upload .PPR File</label>
-        									<input type="file" class="form-control" id="file-upload" 
-            								accept=".csv,.xlsx,.xls,.ppr" required>
-   									 </div>
-								</form>                                            
+                                            <div class="mb-3">
+                                                <label for="file-upload" class="form-label">Upload .PPR File</label>
+                                                <input type="file" class="form-control" id="file-upload" 
+                                                    accept=".csv,.xlsx,.xls,.ppr" required>
+                                            </div>
+                                        </form>                                            
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dashboard Section -->
+                        <div id="dashboard-section" class="dashboard-hidden mb-4">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="card dashboard-card h-100 border-0 shadow-sm">
+                                        <div class="card-body text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <i class="fas fa-file-alt stats-icon text-primary"></i>
+                                                <div class="text-end">
+                                                    <h2 class="mb-0 fw-bold text-primary" id="total-count">0</h2>
+                                                </div>
+                                            </div>
+                                            <h6 class="text-muted mb-0">Total Lines</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card dashboard-card h-100 border-0 shadow-sm">
+                                        <div class="card-body text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <i class="fas fa-check-circle stats-icon text-success"></i>
+                                                <div class="text-end">
+                                                    <h2 class="mb-0 fw-bold text-success" id="accepted-count">0</h2>
+                                                </div>
+                                            </div>
+                                            <h6 class="text-muted mb-0">Accepted</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card dashboard-card h-100 border-0 shadow-sm">
+                                        <div class="card-body text-center">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <i class="fas fa-times-circle stats-icon text-danger"></i>
+                                                <div class="text-end">
+                                                    <h2 class="mb-0 fw-bold text-danger" id="rejected-count">0</h2>
+                                                </div>
+                                            </div>
+                                            <h6 class="text-muted mb-0">Rejected (IR)</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="mb-3 d-flex align-items-center">
                             <button class="btn btn-secondary" id="copy-selected" disabled>
