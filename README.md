@@ -6,12 +6,12 @@ Web application for processing and validating order response files against a pro
 
 - File upload support for CSV and PPR files
 - ISBN validation against data.json
-- Statistics dashboard with real-time metrics
+- Comprehensive statistics dashboard with real-time metrics
+- Advanced filtering options for different error types
 - Row selection with checkboxes
 - Copy selected rows as formatted table
-- Download processed file with updated values
-- Response status highlighting (IR responses in red)
-- Filter to show only rejected (IR) items
+- Flexible download options (all lines or filtered)
+- Response status highlighting with color coding
 - Responsive Bootstrap UI
 
 ## File Format Requirements
@@ -37,56 +37,77 @@ data.json format:
 ## Functionality
 
 ### 1. **Dashboard Statistics**
+   The dashboard displays four key metrics in a single compact row:
    - **Total Lines**: Count of all processed records
-   - **Accepted**: Count of items found in database (Available status)
-   - **Rejected (IR)**: Count of items not found in database
-   - Dashboard appears after file processing and hides when cleared
-   - Real-time updates based on processed data
+   - **Available**: Items found in database with successful responses (no errors)
+   - **Other Errors**: Items found in database but with error responses/messages
+   - **Missing (IR)**: Items not found in database (converted to IR responses)
+   
+   Dashboard appears after file processing and hides when cleared with real-time updates based on processed data.
 
-### 2. **ISBN Validation**
-   - Checks ISBN against data.json
-   - Updates Status column: Available/Not Available
-   - For unavailable items:
+### 2. **ISBN Validation & Status Classification**
+   - Checks ISBN against data.json database
+   - **Available**: ISBN found in database + successful response (AR or no error indicators)
+   - **Other Errors**: ISBN found in database but has error indicators:
+     - Response code is "IR"
+     - Message contains "error", "unavailable", or "not available"  
+     - Response code is not "AR"
+   - **Not Available**: ISBN not found in database
      - Changes Response to "IR"
      - Changes Message to "Item Template not found"
 
-### 3. **Row Selection**
+### 3. **Advanced Filtering Options**
+   Three mutually exclusive filter toggles:
+   - **Show Missing File Lines Only**: Displays only items not found in database (IR responses)
+   - **Show Other Error Messages Only**: Displays only items in database but with error responses
+   - **Show Available Only**: Displays only items in database with successful responses
+   
+   Filters are mutually exclusive - selecting one automatically deselects others.
+
+### 4. **Row Selection & Copy**
    - Individual row selection with checkboxes
    - Select all checkbox in header
-   - Copy selected rows as formatted table
-   - Retains formatting (IR highlighting)
+   - Copy selected rows as formatted table to clipboard
+   - Retains visual formatting (IR highlighting, color coding)
 
-### 4. **Filtering Options**
-   - "Show Missing File Lines Only" toggle
-   - Filters table to display only rejected (IR) items
-   - Dashboard statistics remain unchanged when filtering
+### 5. **Flexible Download Options**
+   Split-button dropdown with two download modes:
+   - **Download All Lines**: Complete file with all processed data (default)
+   - **Download Excluding Other Errors**: Filtered file omitting "Other Error" lines
+     - Only includes Available and Missing (IR) items
+     - Adds "_filtered" suffix to filename
+     - Maintains original file format and structure
 
-### 5. **File Operations**
-   - Download maintains original file name and format
-   - File save dialog for download location
-   - Updated values reflected in download
+### 6. **Visual Status Indicators**
+   - **Green background**: Available items (successful processing)
+   - **Yellow background**: Other errors (in database but with issues)
+   - **Red background**: Missing items (not in database, converted to IR)
+   - **Red text**: IR response codes for emphasis
 
-### 6. **UI Features**
-   - Clean statistics dashboard with card-based layout
-   - Response highlighting (IR in red with white text)
-   - Clear function resets all inputs and hides dashboard
-   - Responsive table layout
-   - Message column width optimized for content
-   - Hover effects on dashboard cards
+## Dashboard Layout
 
-## Dashboard Metrics
+The compact dashboard fits all metrics in one row:
 
-The dashboard provides three key metrics:
+| Total Lines | Available | Other Errors | Missing (IR) |
+|------------|-----------|--------------|-------------|
+| All records | Successful items | Database items with errors | Items not found |
 
-- **Total Lines**: Shows the complete count of processed records
-- **Accepted**: Items successfully found in the database
-- **Rejected (IR)**: Items that will receive "Item Template not found" responses
+## Filtering Workflow
+
+1. **Upload file** → View complete dashboard statistics
+2. **Apply filters** → Focus on specific issue types:
+   - Use "Other Errors" to investigate database items with problems
+   - Use "Missing" to review items that will get IR responses
+   - Use "Available" to verify successful processing
+3. **Download options** → Choose appropriate output:
+   - Download all for complete audit trail
+   - Download filtered for clean processing files
 
 ## Browser Compatibility
 
 Tested and working in:
 - Chrome
-- Safari
+- Safari  
 - Firefox
 
 ## Dependencies
@@ -108,10 +129,16 @@ Tested and working in:
 ## Usage
 
 1. **Upload File**: Select a CSV or PPR file using the file upload input
-2. **View Dashboard**: Automatic statistics display showing processing results
-3. **Review Results**: Table shows all records with status and updated responses
-4. **Filter Data**: Toggle "Show Missing File Lines Only" to view rejected items
-5. **Select Rows**: Use checkboxes to select specific rows for copying
-6. **Copy Data**: Copy selected rows as formatted table to clipboard
-7. **Download**: Save processed file with updated IR responses and messages
-8. **Clear**: Reset application to process another file
+2. **Review Dashboard**: View automatic statistics showing processing breakdown
+3. **Apply Filters**: Use toggles to focus on specific issue types
+4. **Select & Copy**: Choose specific rows and copy as formatted table
+5. **Download Results**: 
+   - Click main button for complete file
+   - Use dropdown for filtered file excluding other errors
+6. **Clear & Repeat**: Reset application to process another file
+
+## File Naming
+
+- **Standard download**: Uses original filename
+- **Filtered download**: Adds "_filtered" suffix (e.g., "orders_filtered.csv")
+- **File extensions**: Preserves original format (.csv, .ppr, etc.)

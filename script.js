@@ -1,6 +1,8 @@
 let booksData = [];
 let processedResults = [];
 let showIROnly = false;
+let showOtherErrors = false;
+let showAvailableOnly = false;
 
 // Wrap all initialization code in DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -13,10 +15,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Other button listeners
     document.getElementById('clear-button').addEventListener('click', clearForm);
-    document.getElementById('download-button').addEventListener('click', downloadResults);
+    document.getElementById('download-button').addEventListener('click', () => downloadResults(false));
+    document.getElementById('download-all').addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadResults(false);
+    });
+    document.getElementById('download-exclude-errors').addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadResults(true);
+    });
     document.getElementById('copy-selected').addEventListener('click', copySelectedRows);
     document.getElementById('show-ir-only').addEventListener('change', function(e) {
         showIROnly = e.target.checked;
+        if (e.target.checked) {
+            document.getElementById('show-other-errors').checked = false;
+            document.getElementById('show-available-only').checked = false;
+            showOtherErrors = false;
+            showAvailableOnly = false;
+        }
+        displayResults();
+    });
+    
+    document.getElementById('show-other-errors').addEventListener('change', function(e) {
+        showOtherErrors = e.target.checked;
+        if (e.target.checked) {
+            document.getElementById('show-ir-only').checked = false;
+            document.getElementById('show-available-only').checked = false;
+            showIROnly = false;
+            showAvailableOnly = false;
+        }
+        displayResults();
+    });
+    
+    document.getElementById('show-available-only').addEventListener('change', function(e) {
+        showAvailableOnly = e.target.checked;
+        if (e.target.checked) {
+            document.getElementById('show-ir-only').checked = false;
+            document.getElementById('show-other-errors').checked = false;
+            showIROnly = false;
+            showOtherErrors = false;
+        }
         displayResults();
     });
 
@@ -51,19 +89,30 @@ function handleFileUpload(file) {
                 const [orderRef, sequence, isbn, response, message] = parts;
                 const isAvailable = booksData.some(book => book.code === isbn);
                 
+                // Determine if this is an "other error" (available in database but has error response/message)
+                const isOtherError = isAvailable && response && (
+                    response.toUpperCase() === 'IR' || 
+                    (message && message.toLowerCase().includes('error')) ||
+                    (message && message.toLowerCase().includes('unavailable')) ||
+                    (message && message.toLowerCase().includes('not available')) ||
+                    (response && response.toUpperCase() !== 'AR')
+                );
+                
                 processedResults.push({
                     orderRef,
                     sequence,
                     isbn,
                     response,
                     message,
-                    status: isAvailable ? 'Available' : 'Not Available'
+                    status: isAvailable ? 'Available' : 'Not Available',
+                    isOtherError: isOtherError
                 });
             });
             
             updateDashboard();
             displayResults();
             document.getElementById('download-button').disabled = false;
+            document.getElementById('download-dropdown').disabled = false;
         }
     };
     
@@ -87,13 +136,15 @@ function updateDashboard() {
 
     // Calculate statistics
     const totalCount = processedResults.length;
-    const acceptedCount = processedResults.filter(row => row.status === 'Available').length;
+    const acceptedCount = processedResults.filter(row => row.status === 'Available' && !row.isOtherError).length;
     const rejectedCount = processedResults.filter(row => row.status === 'Not Available').length;
+    const otherErrorsCount = processedResults.filter(row => row.isOtherError).length;
 
     // Update dashboard elements
     document.getElementById('total-count').textContent = totalCount.toLocaleString();
     document.getElementById('accepted-count').textContent = acceptedCount.toLocaleString();
     document.getElementById('rejected-count').textContent = rejectedCount.toLocaleString();
+    document.getElementById('other-errors-count').textContent = otherErrorsCount.toLocaleString();
 }
 
 function displayResults() {
@@ -134,13 +185,27 @@ function displayResults() {
     // Body
     const tbody = document.createElement('tbody');
     processedResults.forEach((row, index) => {
-        // Skip non-IR rows when filter is active
+        // Apply filters
         if (showIROnly && row.status !== 'Not Available') {
+            return;
+        }
+        if (showOtherErrors && !row.isOtherError) {
+            return;
+        }
+        if (showAvailableOnly && (row.status !== 'Available' || row.isOtherError)) {
             return;
         }
 
         const tr = document.createElement('tr');
-        tr.className = row.status === 'Available' ? 'result-available' : 'result-unavailable';
+        
+        // Set row styling based on status and error type
+        if (row.status === 'Available' && !row.isOtherError) {
+            tr.className = 'result-available';
+        } else if (row.isOtherError) {
+            tr.className = 'table-warning'; // Yellow background for other errors
+        } else {
+            tr.className = 'result-unavailable'; // Red background for not available
+        }
         
         // Add checkbox cell
         const checkboxCell = document.createElement('td');
@@ -153,16 +218,19 @@ function displayResults() {
         
         let displayResponse = row.response;
         let displayMessage = row.message;
+        let displayStatus = row.status;
         
         if (row.status === 'Not Available') {
             displayResponse = 'IR';
             displayMessage = 'Item Template not found';
+        } else if (row.isOtherError) {
+            displayStatus = 'Other Error';
         }
         
-        [row.orderRef, row.sequence, row.isbn, displayResponse, displayMessage, row.status].forEach((text, index) => {
+        [row.orderRef, row.sequence, row.isbn, displayResponse, displayMessage, displayStatus].forEach((text, index) => {
             const td = document.createElement('td');
             td.textContent = text;
-            if (index === 3 && text.trim() === 'IR') {
+            if (index === 3 && text.trim().toUpperCase() === 'IR') {
                 td.className = 'response-ir';
             }
             tr.appendChild(td);
@@ -239,16 +307,26 @@ function clearForm() {
     document.getElementById('results-table').innerHTML = '';
     document.getElementById('dashboard-section').classList.add('dashboard-hidden');
     document.getElementById('download-button').disabled = true;
+    document.getElementById('download-dropdown').disabled = true;
     document.getElementById('copy-selected').disabled = true;
     document.getElementById('show-ir-only').checked = false;
+    document.getElementById('show-other-errors').checked = false;
+    document.getElementById('show-available-only').checked = false;
     showIROnly = false;
+    showOtherErrors = false;
+    showAvailableOnly = false;
     processedResults = [];
 }
 
-function downloadResults() {
+function downloadResults(excludeOtherErrors = false) {
     if (!processedResults.length) return;
     
-    const outputLines = processedResults.map(row => {
+    // Filter results based on the exclude option
+    const resultsToDownload = excludeOtherErrors 
+        ? processedResults.filter(row => !row.isOtherError)
+        : processedResults;
+    
+    const outputLines = resultsToDownload.map(row => {
         let response = row.response;
         let message = row.message;
         
@@ -262,8 +340,16 @@ function downloadResults() {
 
     const fileInput = document.getElementById('file-upload');
     const originalName = fileInput.files[0].name;
+    const baseName = originalName.replace(/\.[^/.]+$/, "");
+    const extension = originalName.split('.').pop();
+    
+    // Add suffix to filename if excluding other errors
+    const fileName = excludeOtherErrors 
+        ? `${baseName}_filtered.${extension}`
+        : originalName;
+    
     const options = {
-        suggestedName: originalName,
+        suggestedName: fileName,
         types: [{
             description: 'CSV file',
             accept: { 'text/csv': ['.csv', '.ppr'] }
@@ -283,7 +369,7 @@ function downloadResults() {
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = originalName;
+                link.download = fileName;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -295,7 +381,7 @@ function downloadResults() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = originalName;
+        link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

@@ -23,15 +23,13 @@
         }
         .dashboard-card {
             transition: transform 0.2s;
-            padding-right: 30px;
         }
         .dashboard-card:hover {
             transform: translateY(-2px);
         }
         .stats-icon {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             opacity: 0.8;
-            padding-left: 30px;
         }
         .dashboard-hidden {
             display: none;
@@ -49,9 +47,18 @@
                             <button class="btn btn-outline-light me-2" id="clear-button">
                                 <i class="fas fa-trash"></i> Clear
                             </button>
-                            <button class="btn btn-outline-light" id="download-button" disabled>
-                                <i class="fas fa-download"></i> Download Results
-                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-light" id="download-button" disabled>
+                                    <i class="fas fa-download"></i> Download Results
+                                </button>
+                                <button class="btn btn-outline-light dropdown-toggle dropdown-toggle-split" id="download-dropdown" disabled data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" id="download-all">Download All Lines</a></li>
+                                    <li><a class="dropdown-item" href="#" id="download-exclude-errors">Download Excluding Other Errors</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -76,56 +83,77 @@
 
                         <!-- Dashboard Section -->
                         <div id="dashboard-section" class="dashboard-hidden mb-4">
-                            <div class="row g-4">
-                                <div class="col-md-4">
+                            <div class="row g-3">
+                                <div class="col-md-3">
                                     <div class="card dashboard-card h-100 border-0 shadow-sm">
-                                        <div class="card-body text-center">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <i class="fas fa-file-alt stats-icon text-primary"></i>
+                                        <div class="card-body text-center py-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <i class="fas fa-file-alt text-primary" style="font-size: 1.8rem;"></i>
                                                 <div class="text-end">
-                                                    <h2 class="mb-0 fw-bold text-primary" id="total-count">0</h2>
+                                                    <h3 class="mb-0 fw-bold text-primary" id="total-count">0</h3>
                                                 </div>
                                             </div>
-                                            <h6 class="text-muted mb-0">Total Lines</h6>
+                                            <h6 class="text-muted mb-0 small">Total Lines</h6>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="card dashboard-card h-100 border-0 shadow-sm">
-                                        <div class="card-body text-center">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <i class="fas fa-check-circle stats-icon text-success"></i>
+                                        <div class="card-body text-center py-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <i class="fas fa-check-circle text-success" style="font-size: 1.8rem;"></i>
                                                 <div class="text-end">
-                                                    <h2 class="mb-0 fw-bold text-success" id="accepted-count">0</h2>
+                                                    <h3 class="mb-0 fw-bold text-success" id="accepted-count">0</h3>
                                                 </div>
                                             </div>
-                                            <h6 class="text-muted mb-0">Accepted</h6>
+                                            <h6 class="text-muted mb-0 small">Available</h6>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="card dashboard-card h-100 border-0 shadow-sm">
-                                        <div class="card-body text-center">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <i class="fas fa-times-circle stats-icon text-danger"></i>
+                                        <div class="card-body text-center py-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <i class="fas fa-exclamation-triangle text-warning" style="font-size: 1.8rem;"></i>
                                                 <div class="text-end">
-                                                    <h2 class="mb-0 fw-bold text-danger" id="rejected-count">0</h2>
+                                                    <h3 class="mb-0 fw-bold text-warning" id="other-errors-count">0</h3>
                                                 </div>
                                             </div>
-                                            <h6 class="text-muted mb-0">Rejected (IR)</h6>
+                                            <h6 class="text-muted mb-0 small">Other Errors</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card h-100 border-0 shadow-sm">
+                                        <div class="card-body text-center py-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <i class="fas fa-times-circle text-danger" style="font-size: 1.8rem;"></i>
+                                                <div class="text-end">
+                                                    <h3 class="mb-0 fw-bold text-danger" id="rejected-count">0</h3>
+                                                </div>
+                                            </div>
+                                            <h6 class="text-muted mb-0 small">Missing (IR)</h6>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3 d-flex align-items-center">
+                        <div class="mb-3 d-flex align-items-center flex-wrap gap-3">
                             <button class="btn btn-secondary" id="copy-selected" disabled>
                                 <i class="fas fa-copy"></i> Copy Selected
                             </button>
-                            <div class="form-check form-switch ms-3">
+                            <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="show-ir-only">
                                 <label class="form-check-label" for="show-ir-only">Show Missing File Lines Only</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="show-other-errors">
+                                <label class="form-check-label" for="show-other-errors">Show Other Error Messages Only</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="show-available-only">
+                                <label class="form-check-label" for="show-available-only">Show Available Only</label>
                             </div>
                         </div>
 
